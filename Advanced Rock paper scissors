@@ -1,0 +1,87 @@
+import random
+
+
+class RockPaperScissors:
+
+    def __init__(self):
+        self.dict_ = {}
+        self.comp = ""
+        self.rating = open('rating.txt', 'r')
+        self.score = 0
+        
+    def check(self, user):
+        if self.comp in self.dict_[user]:
+            print(f"Well done. Computer chose {self.comp} and failed")
+            self.score += 100
+        elif self.comp == user:
+            print(f'There is a draw ({self.comp})')
+            self.score += 50
+        else:
+            print(f'Sorry, but computer chose {self.comp}')
+
+    def dictionary(self):
+        user = input()
+        print("Hello, " + user)
+        for li in self.rating.readlines():
+            a = li.index(" ")
+            if user == li[0:a]:
+                self.score = int(li[a+1:])
+
+        list_ = input().replace(",", " ")
+        list_ = list(list_.split())
+        # print(list_)
+        if len(list_) == 0:
+            self.dict_ = {"scissors": "paper", "rock": "scissors", "paper": "rock"}
+        else:
+            self.game(list_)
+        print("Okay, let's start")
+
+    def call(self):
+        while True:
+            user = input()
+            random.seed()
+            self.comp = random.choice(list(self.dict_))
+            if user in list(self.dict_):
+                self.check(user)
+            elif user == "!exit":
+                break
+            elif user == "!rating":
+                print(f"Your rating: {self.score}")
+
+            else:
+                try:
+                    int(user)
+                except:
+                    print("Invalid input")
+        print("Bye!")
+        self.rating.close()
+
+    def game(self, list_):  # selects the game according to the user's choice. Empty line makes it the default game
+        total = ["fire", "scissors", "snake", "human", "tree", "wolf", "sponge", "paper", "air", "water", "dragon"]
+        total.extend(["devil", "lightning", "gun", "rock"])
+        length = len(total)
+        # print(length)
+        try:
+            for i in list_:
+                self.dict_[i] = []
+                a = total.index(i)
+                if length - a > 7:
+                    for j in total[a+1:a+8]:
+                        # print(j)
+                        if j in list_:
+                            self.dict_[i].append(j)
+                else:
+                    b = 7 - (length - a - 1)
+                    for j in total[a+1:]:
+                        if j in list_:
+                            self.dict_[i].append(j)
+                    for j in total[:b]:
+                        if j in list_:
+                            self.dict_[i].append(j)
+        except ValueError:  # may not be required
+            pass
+
+
+r1 = RockPaperScissors()
+r1.dictionary()
+r1.call()

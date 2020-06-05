@@ -1,0 +1,127 @@
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, String, Integer, Date
+from datetime import datetime, timedelta
+from sqlalchemy.orm import sessionmaker
+
+
+engine = create_engine('sqlite:///todo.db?check_same_thread=False')
+
+
+class ToDoList:
+    Base = declarative_base()
+
+    class Table(Base):
+        __tablename__ = 'task'
+        id = Column(Integer, primary_key=True)
+        task = Column(String)
+        deadline = Column(Date, default=datetime.today())
+
+    def __init__(self):
+        self.session = None
+        self.init_database()
+
+    def init_database(self):
+        self.Base.metadata.create_all(engine)
+        session_ = sessionmaker(bind=engine)
+        self.session = session_()
+
+    def print_(self):
+        rows = self.session.query(self.Table).all()
+        today = datetime.today()
+        len_ = len(rows)
+        if len_ == 0:
+            print("Nothing to do!")
+        else:
+            for i in range(len_):
+                print(f"{str(i)}. {rows[i].task}. {today.day} {today.strftime('%b')}")
+
+    def today_(self):
+        today = datetime.today()
+        rows = self.session.query(self.Table).filter(self.Table.deadline == today.date()).all()
+        len_ = len(rows)
+        print(f"Today {today.day} {today.strftime('%b')}")
+        if len_ == 0:
+            print("Nothing to do!\n")
+        else:
+            for i in range(len_):
+                print(str(i+1) + ". " + rows[i].task)
+        print()
+
+    def week_(self):
+        today = datetime.today()
+        for i in range(7):
+            date_ = today + timedelta(days=i)
+            week = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+            print(f"{week[date_.weekday()]} {date_.day} {date_.strftime('%b')}:")
+            rows = self.session.query(self.Table).filter(self.Table.deadline == date_.date()).all()
+            len_ = len(rows)
+            if len_ == 0:
+                print("Nothing to do!\n")
+            else:
+                for j in range(len_):
+                    print(str(j+1) + ". " + rows[j].task)
+                print()
+
+    def entry_(self):
+        print("Enter task")
+        inp = input()
+        print("Enter deadline")
+        dead = input()
+        dead = datetime.strptime(dead, '%Y-%m-%d')
+        next_row = self.Table(task=inp, deadline=dead)
+        self.session.add(next_row)
+        self.session.commit()
+        print("The task has been added!\n")
+
+    def missed_(self):
+        print("Missed tasks:")
+        today = datetime.today()
+        rows = self.session.query(self.Table).filter(self.Table.deadline < datetime.today()).all()
+        a = today.strftime('%b')
+        for i in range(len(rows)):
+            print(f'{i+1}. {rows[i].task}. {today.day} {a}')
+        print()
+
+    def delete_(self):
+        rows = self.session.query(self.Table).order_by(self.Table.deadline)
+        print("Chose the number of the task you want to delete:")
+        count = 1
+        for i in rows:
+            a = i.deadline
+            b = a.strftime('%b')
+            print(f'{count}. {i.task}. {a.day} {b}')
+            count += 1
+        del_ = int(input())
+        self.session.delete(rows[del_-1])
+        print()
+        self.session.commit()
+
+
+    def main_(self):
+        while True:
+            print("1) Today's tasks\n2) Week's tasks\n3) All tasks\n4) Missed tasks\n5) Add task\n6) Delete task")
+            print("0) Exit")
+            entry = int(input())
+            print()
+            if entry == 1:
+                self.today_()
+            elif entry == 2:
+                self.week_()
+            elif entry == 3:
+                self.print_()
+            elif entry == 4:
+                self.missed_()
+            elif entry == 5:
+                self.entry_()
+            elif entry == 6:
+                self.delete_()
+            elif entry == 0:
+                print("Bye!")
+                exit()
+            else:
+                self.print_()
+
+
+t1 = ToDoList()
+t1.main_()

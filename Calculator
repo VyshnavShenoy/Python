@@ -1,0 +1,104 @@
+def calc(inp):
+    # inp.replace(" ", "")
+    # print(inp)
+    list_ = list(inp.split())
+    # print(list_)
+    count = 0
+    op = "+"
+    result = 0
+    for i in list_:
+        # print(i)
+        if "+" in i or "-" in i:
+            count = len(i)
+            op = i[0]
+        else:
+            if "+" in op or not count % 2:
+                result += int(i)
+            else:
+                result -= int(i)
+    try:
+        if int(list_[0]) < 0:
+            result += int(list_[0])
+    except:
+        pass
+    print(result)
+
+
+def easy(inp, **dict):
+    s = ""
+    for i in inp:
+        if i in dict.keys():
+            s += str(dict[i])
+        else:
+            s += i
+    try:
+        print(int(eval(s)))
+    except:
+        if s.isalpha():
+            print("Unknown variable")
+        else:
+            print("Invalid expression")
+
+
+def start():
+    check = True
+    while check:
+        inp = input()
+        if inp == "":
+            continue
+        elif inp == "/exit":
+            break
+        elif inp == "/help":
+            print("The program calculates the sum of numbers")
+        elif inp.startswith("/"):
+            print("Unknown command")
+        else:
+            easy(inp)
+    print("Bye!")
+
+
+def check():
+    dict ={}
+    while True:
+        inp = input()
+        if "=" in inp:
+            a = inp.index("=")
+            if inp.count("=") > 1:
+                print("Invalid assignment")
+                continue
+            key = inp[:a]
+            key = key.strip()
+            value = inp[a + 1:]
+            value = value.strip()
+            # print(key, value)
+            if not key.isalpha():
+                print("Invalid identifier")
+                continue
+            dict[key] = value
+            # print(dict)
+            for i, j in dict.items():
+                try:
+                    dict[i] = int(j)
+                except ValueError:
+                    try:
+                        dict[i] = int(dict[j])
+                    except:
+                        print("Invalid assignment")
+                        value = 1
+            if value == 1:
+                del dict[key]
+        elif inp.strip() in dict.keys():
+            print(dict[inp.strip()])
+        elif inp == "/exit":
+            print("Bye!")
+            break
+        elif inp == "/help":
+            print("The program calculates the sum of numbers")
+        elif inp.startswith("/"):
+            print("Unknown command")
+        elif inp == "":
+            continue
+        else:
+            easy(inp, **dict)
+
+check()

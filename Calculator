@@ -1,30 +1,4 @@
-def calc(inp):
-    # inp.replace(" ", "")
-    # print(inp)
-    list_ = list(inp.split())
-    # print(list_)
-    count = 0
-    op = "+"
-    result = 0
-    for i in list_:
-        # print(i)
-        if "+" in i or "-" in i:
-            count = len(i)
-            op = i[0]
-        else:
-            if "+" in op or not count % 2:
-                result += int(i)
-            else:
-                result -= int(i)
-    try:
-        if int(list_[0]) < 0:
-            result += int(list_[0])
-    except:
-        pass
-    print(result)
-
-
-def easy(inp, **dict):
+def easy(inp, **dict):  # evaluates an expression
     s = ""
     for i in inp:
         if i in dict.keys():
@@ -40,24 +14,9 @@ def easy(inp, **dict):
             print("Invalid expression")
 
 
-def start():
-    check = True
-    while check:
-        inp = input()
-        if inp == "":
-            continue
-        elif inp == "/exit":
-            break
-        elif inp == "/help":
-            print("The program calculates the sum of numbers")
-        elif inp.startswith("/"):
-            print("Unknown command")
-        else:
-            easy(inp)
-    print("Bye!")
-
-
-def check():
+# the check function checks what the user wants as output
+# it includes the option of outputing the value of a variable, a help option and to exit the program.
+def check():  # checks for errors in the expression.
     dict ={}
     while True:
         inp = input()
